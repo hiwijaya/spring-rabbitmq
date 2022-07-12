@@ -1,11 +1,7 @@
 package com.hiwijaya.springrabbitmq.exchangeHeaders;
 
 import com.hiwijaya.springrabbitmq.model.Order;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.support.converter.MessageConverter;
-import org.springframework.amqp.support.converter.SimpleMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,14 +22,13 @@ public class HeadersExchangePublisher {
 
         order.setId(UUID.randomUUID().toString());
 
-        MessageProperties messageProperties = new MessageProperties();
-        messageProperties.setHeader("format", "pdf");
-        messageProperties.setHeader("type", "report");
+        rabbitTemplate.convertAndSend(HEADERS_EXCHANGE, "", order, message -> {
 
-        MessageConverter messageConverter = new SimpleMessageConverter();
-        Message message = messageConverter.toMessage(order, messageProperties);
+            message.getMessageProperties().setHeader("format", "pdf");
+            message.getMessageProperties().setHeader("type", "report");
 
-        rabbitTemplate.convertAndSend(HEADERS_EXCHANGE, "", message);
+            return message;
+        });
 
         return "success";
     }
