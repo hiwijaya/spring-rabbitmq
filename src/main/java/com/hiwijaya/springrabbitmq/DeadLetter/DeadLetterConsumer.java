@@ -34,7 +34,11 @@ public class DeadLetterConsumer {
         retriesCount = (retriesCount == null) ? 1 : retriesCount;
 
         if(retriesCount > MAX_RETRIES_COUNT){
-            log.warn("Discarding message");
+            log.warn("Sending message to parking lot queue");
+            rabbitTemplate.send(
+                    DeadLetterConfig.EXCHANGE_PARKING_LOT,
+                    failedMessage.getMessageProperties().getReceivedRoutingKey(),
+                    failedMessage);
             return;
         }
 
@@ -46,6 +50,15 @@ public class DeadLetterConsumer {
                 DeadLetterConfig.EXCHANGE_MESSAGES,
                 failedMessage.getMessageProperties().getReceivedRoutingKey(),
                 failedMessage);
+
+    }
+
+    @RabbitListener(queues = DeadLetterConfig.QUEUE_PARKING_LOT)
+    public void parkingLot(Message failedMessage){
+
+        log.warn("Received message in parking lot queue");
+
+        // Save to DB or send a notification
 
     }
 
