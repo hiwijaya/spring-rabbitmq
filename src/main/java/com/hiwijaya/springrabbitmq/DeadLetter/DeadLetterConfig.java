@@ -13,6 +13,8 @@ public class DeadLetterConfig {
     public static final String QUEUE_DEAD_LETTER = "dead_letter_queue";
     public static final String EXCHANGE_DEAD_LETTER = "dead_letter_exchange";
 
+    public static final String HEADER_X_RETRIES_COUNT = "x-retries-count";
+
 
     @Bean
     public Declarables binding() {
